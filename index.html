@@ -573,7 +573,7 @@ document.getElementById('contactSellerBtn').addEventListener('click', ()=>{
 /* utils: init */
 function init(){
   // replace placeholder SHIPPING_COST function with actual value injected
-  window.SHIPPING_COST = function(){ return Number(${SHIPPING_COST}); };
+
   // if user didn't replace email, warn once
   if(STORE_EMAIL === 'YOUR_STORE_EMAIL@example.com') console.warn('Please set STORE_EMAIL variable in the script to receive orders.');
   renderProducts(); updateCartUI();
