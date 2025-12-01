@@ -1,0 +1,598 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>F T shop — المتجر</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --bg-1: #f6f3ff;
+  --purple-1: #6a1b9a;
+  --purple-2: #8e24aa;
+  --accent: #ab47bc;
+  --muted: #666;
+  --white: #ffffff;
+  --shadow: 0 10px 30px rgba(15,10,30,0.08);
+  --card-bg: #fff;
+  --shipping: 400; /* فقط للعرض في CSS -- القيمة الحقيقية بالتعامل مع JS */
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;font-family:'Cairo',sans-serif;background:linear-gradient(180deg,var(--bg-1),#f0ecff)}
+a{color:inherit;text-decoration:none}
+.container{max-width:1150px;margin:18px auto;padding:16px}
+
+/* header */
+.header{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px;border-radius:12px;background:linear-gradient(90deg,var(--purple-1),var(--purple-2));color:var(--white);box-shadow:var(--shadow)}
+.brand{display:flex;gap:12px;align-items:center}
+.logo{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,#fff,#f3e6ff);display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--purple-1)}
+.shopTitle{font-weight:700;font-size:18px}
+.header-actions{display:flex;gap:8px;align-items:center}
+
+/* hero */
+.hero{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin-top:16px;padding:22px;border-radius:12px;background:linear-gradient(180deg, rgba(106,27,154,0.06), rgba(142,36,170,0.04));border:1px solid rgba(106,27,154,0.08)}
+.hero .left{max-width:640px}
+.hero h1{margin:0;font-size:34px;color:var(--purple-1)}
+.hero p{margin:8px 0 0;color:#2b2b2b}
+
+/* layout */
+.main{display:grid;grid-template-columns: 1fr 380px;gap:18px;margin-top:18px}
+@media(max-width:980px){ .main{grid-template-columns:1fr} .header{flex-direction:column;align-items:flex-start} }
+
+/* product area */
+.storePanel{background:var(--card-bg);padding:14px;border-radius:12px;border:1px solid rgba(0,0,0,0.04);box-shadow:var(--shadow)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+
+/* card */
+.card{background:#fff;border-radius:12px;border:1px solid rgba(0,0,0,0.04);overflow:hidden;box-shadow:0 10px 20px rgba(10,8,20,0.04);display:flex;flex-direction:column}
+.card-img{height:220px;display:flex;align-items:center;justify-content:center;background:#f7f7fb}
+.card-img img{max-width:100%;max-height:100%;object-fit:contain}
+.card-body{padding:12px;flex:1;display:flex;flex-direction:column;gap:8px}
+.card h3{margin:0;font-size:16px}
+.badges{display:flex;gap:8px;flex-wrap:wrap}
+.badge{font-size:12px;padding:6px 8px;border-radius:999px;background:linear-gradient(90deg,var(--purple-1),var(--purple-2));color:white;font-weight:700}
+
+/* price + actions */
+.priceRow{display:flex;justify-content:space-between;align-items:center;margin-top:auto}
+.price{font-weight:800;color:var(--purple-2);font-size:18px}
+.actions{display:flex;gap:8px}
+.btn{padding:10px 12px;border-radius:10px;border:none;cursor:pointer;font-weight:700}
+.btn-primary{background:linear-gradient(90deg,var(--purple-1),var(--purple-2));color:white}
+.btn-ghost{background:transparent;border:1px solid rgba(30,30,30,0.06);color:#222}
+
+/* sidebar */
+.sidebar{display:flex;flex-direction:column;gap:12px}
+.card-side{background:white;padding:12px;border-radius:12px;border:1px solid rgba(0,0,0,0.04);box-shadow:var(--shadow)}
+.cartList{display:flex;flex-direction:column;gap:8px;max-height:280px;overflow:auto}
+.cartItem{display:flex;gap:8px;align-items:center;border-radius:8px;padding:8px;border:1px solid rgba(0,0,0,0.03)}
+.cartItem img{width:64px;height:48px;object-fit:cover;border-radius:6px}
+
+/* totals */
+.totals{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.totalRow{display:flex;justify-content:space-between;align-items:center;font-weight:700}
+
+/* upload form */
+.form-row{display:flex;flex-direction:column;gap:8px}
+.input,textarea{padding:10px;border-radius:8px;border:1px solid #ddd}
+.small{width:48%}
+
+/* modals */
+.modal-back{position:fixed;inset:0;background:rgba(2,6,23,0.5);display:none;align-items:center;justify-content:center;z-index:80}
+.modal{width:100%;max-width:720px;background:white;border-radius:12px;padding:16px;border:1px solid rgba(0,0,0,0.06)}
+.modal h2{margin:0 0 8px 0}
+
+/* footer */
+.footer{margin-top:18px;text-align:center;color:var(--muted)}
+
+/* micro interactions */
+.iconBtn{background:rgba(255,255,255,0.06);border-radius:10px;padding:8px;cursor:pointer}
+.smallNote{font-size:13px;color:var(--muted)}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- header -->
+  <div class="header">
+    <div class="brand">
+      <div class="logo">FT</div>
+      <div>
+        <div class="shopTitle">F T shop</div>
+        <div class="smallNote">متجر بنفسجي عصري • توصيل لكل الولايات ولمكاتب البريد</div>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <button class="btn btn-ghost" id="openUploadBtn">➕ أضف سلعتك</button>
+      <button class="btn btn-ghost" id="openAdminBtn">⚙️ لوحة المالك</button>
+      <button class="btn btn-primary" id="whatsappBtn">💬 واتساب</button>
+    </div>
+  </div>
+
+  <!-- hero -->
+  <div class="hero">
+    <div class="left">
+      <h1>أهلاً بك في F T shop</h1>
+      <p>تسوّق بأمان، أضف منتجاتك، واطلب مع توصيل ثابت لكل الولايات — سهل واحترافي.</p>
+      <div style="margin-top:12px">
+        <button class="btn btn-primary" onclick="scrollToStore()">🛒 اذهب للمتجر</button>
+        <button class="btn btn-ghost" onclick="openUpload()">➕ أضف سلعتك</button>
+      </div>
+    </div>
+    <div class="right" style="min-width:260px;">
+      <div style="background:linear-gradient(135deg,#ffffff,rgba(255,255,255,0.9));padding:12px;border-radius:12px;color:#3b1050;box-shadow:var(--shadow)">
+        <div style="font-weight:800;font-size:18px">عرض اليوم</div>
+        <div style="margin-top:8px;color:#000">
+          <div style="font-weight:700">iPhone 12 — ازرق</div>
+          <div class="smallNote">البطارية 97% • الحالة 10/10 • قطع أصلية</div>
+          <div style="margin-top:10px;font-size:20px;color:var(--purple-2);font-weight:900">70,000 دج</div>
+          <div style="margin-top:10px">
+            <button class="btn btn-primary" onclick="addToCartDemo()">إضافة للسلة</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- main -->
+  <div class="main">
+    <!-- products -->
+    <div class="storePanel">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div style="font-weight:800;font-size:18px">المنتجات</div>
+        <div class="smallNote">يمكنك التحكم بالمنتجات من لوحة المالك</div>
+      </div>
+
+      <div id="productsGrid" class="grid" style="margin-top:12px">
+        <!-- منتجات تُحمّل من JS -->
+      </div>
+
+      <div style="margin-top:12px;text-align:center">
+        <button class="btn btn-ghost" onclick="openUpload()">➕ اقترح سلعة / أضف سلعتك</button>
+      </div>
+    </div>
+
+    <!-- sidebar -->
+    <aside class="sidebar">
+      <div class="card-side">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div style="font-weight:800">سلة المشتريات</div>
+          <div class="smallNote" id="cartCount">0</div>
+        </div>
+
+        <div class="cartList" id="cartList" style="margin-top:8px">
+          <!-- عناصر السلة -->
+        </div>
+
+        <div class="totals">
+          <div class="totalRow"><div>المجموع:</div><div id="subTotalText">0 دج</div></div>
+          <div class="totalRow"><div>سعر التوصيل (ثابت)</div><div id="shippingText">400 دج</div></div>
+          <div class="totalRow" style="font-size:18px"><div>الإجمالي:</div><div id="grandTotalText">0 دج</div></div>
+
+          <div style="margin-top:8px;display:flex;gap:8px">
+            <button class="btn btn-primary" id="checkoutBtn" style="flex:1">🧾 إنهاء الطلب</button>
+            <button class="btn btn-ghost" id="clearCartBtn">🗑️ تفريغ</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-side">
+        <div style="font-weight:800">خدمات التوصيل</div>
+        <div class="smallNote" style="margin-top:8px">التوصيل متوفر لكل الولايات و مكاتب البريد. السعر ثابت لكل الطلبات: <strong>400 دج</strong></div>
+        <div style="margin-top:10px">
+          <button class="btn btn-primary" id="contactSellerBtn">تواصل مع البائع</button>
+        </div>
+      </div>
+
+      <div class="card-side">
+        <div style="font-weight:800">معلومات سريعة</div>
+        <div class="smallNote" style="margin-top:8px">يمكنك رفع صور منتجاتك، أرسل اقتراح وسيُرسل لك إشعار عبر البريد لمراجعة ونشر المنتج بعد الموافقة.</div>
+      </div>
+    </aside>
+  </div>
+
+  <div class="footer">© <span id="year"></span> F T shop — جميع الحقوق محفوظة</div>
+</div>
+
+<!-- ===== MODALS ===== -->
+<div class="modal-back" id="modalUpload">
+  <div class="modal" role="dialog" aria-modal="true">
+    <h2>أضف / اقترح سلعتك</h2>
+    <p class="smallNote">املأ النموذج لإرسال طلب إضافة السلعة إلى بريد صاحب المتجر للمراجعة.</p>
+
+    <div style="margin-top:8px">
+      <div class="form-row">
+        <input class="input" id="p_title" placeholder="اسم المنتج" />
+        <input class="input" id="p_price" placeholder="السعر (دج)" type="number" />
+        <textarea id="p_desc" placeholder="وصف مختصر"></textarea>
+        <input type="file" id="p_image" accept="image/*" />
+      </div>
+
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px">
+        <button class="btn btn-ghost" onclick="closeModal('modalUpload')">إلغاء</button>
+        <button class="btn btn-primary" onclick="submitProposal()">إرسال للمالك</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-back" id="modalAdmin">
+  <div class="modal" role="dialog">
+    <h2>لوحة المالك</h2>
+    <p class="smallNote">تحكم كامل بالمنتجات المنشورة محليًا. هذه اللوحة تخزن البيانات في متصفحك (localStorage).</p>
+
+    <div style="margin-top:8px;display:flex;gap:8px;flex-direction:column">
+      <div style="display:flex;gap:8px">
+        <input class="input" id="admin_title" placeholder="عنوان المنتج" />
+        <input class="input" id="admin_price" placeholder="السعر" type="number" />
+      </div>
+      <input class="input" id="admin_image" placeholder="رابط صورة (URL) أو اترك فارغ" />
+      <textarea id="admin_desc" class="input" placeholder="وصف المنتج"></textarea>
+
+      <div style="display:flex;gap:8px;justify-content:flex-end">
+        <button class="btn btn-ghost" onclick="closeModal('modalAdmin')">إغلاق</button>
+        <button class="btn btn-primary" onclick="adminAddProduct()">حفظ منتج</button>
+      </div>
+
+      <div style="margin-top:12px">
+        <div style="font-weight:800;margin-bottom:6px">المنتجات المنشورة حالياً</div>
+        <div id="adminProducts" style="display:flex;flex-direction:column;gap:8px;max-height:220px;overflow:auto"></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ===== SCRIPTS ===== -->
+<script>
+/* ===== Config (عدل هنا بسهولة) ===== */
+const STORE_EMAIL = "YOUR_STORE_EMAIL@example.com"; // استبدل بريدك هنا
+const WHATSAPP_NUMBER = ""; // ضع رقمك لاحقاً بصيغة 213661234567 أو اترك فارغاً
+const SHIPPING_COST = 400; // سعر التوصيل الثابت (دج)
+const SHOP_NAME = "F T shop";
+/* ==================================== */
+
+document.getElementById('year').textContent = new Date().getFullYear();
+
+/* ---------- بيانات مبدئية لمنتجات عرضية ---------- */
+/* يمكنك تعديل المنتجات عن طريق لوحة المالك أو تغيير هذه القائمة */
+let defaultProducts = [
+  {
+    id: 'p_demo_iphone12',
+    title: 'iPhone 12 — أزرق',
+    price: 70000,
+    desc: 'البطارية: 97% • الحالة: 10/10 • قطع أصلية',
+    image: 'https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-12-2.jpg'
+  },
+  {
+    id: 'p_demo_watch',
+    title: 'ساعة ذكية - موديل S',
+    price: 12000,
+    desc: 'مقاومة للماء، شحن سريع، مواصفات كاملة',
+    image: 'https://cdn.pixabay.com/photo/2017/08/07/10/21/smart-watch-2601139_1280.jpg'
+  },
+  {
+    id: 'p_demo_headset',
+    title: 'سماعات بلوتوث عالية الجودة',
+    price: 4500,
+    desc: 'صوت نقي، عزل للضوضاء، بطارية طويلة',
+    image: 'https://cdn.pixabay.com/photo/2016/11/29/03/53/headphones-1868910_1280.jpg'
+  }
+];
+
+/* ---------- إدارة المنتجات في localStorage ---------- */
+function loadProducts(){
+  let stored = JSON.parse(localStorage.getItem('ft_products') || 'null');
+  if(!stored){ localStorage.setItem('ft_products', JSON.stringify(defaultProducts)); stored = defaultProducts; }
+  return stored;
+}
+function saveProducts(arr){ localStorage.setItem('ft_products', JSON.stringify(arr)); }
+
+/* ---------- رندر المنتجات في الواجهة ---------- */
+function renderProducts(){
+  const grid = document.getElementById('productsGrid');
+  grid.innerHTML = '';
+  const products = loadProducts();
+  products.forEach(p=>{
+    const card = document.createElement('div'); card.className='card';
+    card.innerHTML = `
+      <div class="card-img"><img src="${p.image}" alt="${escapeHtml(p.title)}" onerror="this.src='https://via.placeholder.com/400x300?text=No+Image'"></div>
+      <div class="card-body">
+        <h3>${escapeHtml(p.title)}</h3>
+        <div class="smallNote">${escapeHtml(p.desc)}</div>
+        <div class="priceRow">
+          <div class="price">${numberWithCommas(p.price)} دج</div>
+          <div class="actions">
+            <button class="btn btn-primary" onclick="addToCart('${p.id}')">🛒 أضف</button>
+            <button class="btn btn-ghost" onclick="quickBuy('${p.id}')">شراء الآن</button>
+          </div>
+        </div>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+/* ---------- عربة التسوق ---------- */
+let CART = JSON.parse(localStorage.getItem('ft_cart') || '[]');
+
+function saveCart(){ localStorage.setItem('ft_cart', JSON.stringify(CART)); updateCartUI(); }
+
+function addToCart(productId){
+  const products = loadProducts();
+  const p = products.find(x=>x.id===productId);
+  if(!p) return alert('المنتج غير موجود');
+  const existing = CART.find(x=>x.id===productId);
+  if(existing) existing.qty += 1;
+  else CART.push({ id:p.id, title:p.title, price:p.price, image:p.image, qty:1 });
+  saveCart();
+  toast('تمت إضافة المنتج إلى السلة');
+}
+
+function addToCartDemo(){ addToCart('p_demo_iphone12'); }
+
+/* حذف/تعديل كمية */
+function removeFromCart(productId){
+  CART = CART.filter(x=>x.id!==productId);
+  saveCart();
+}
+function changeQty(productId, delta){
+  const item = CART.find(x=>x.id===productId);
+  if(!item) return;
+  item.qty += delta;
+  if(item.qty < 1) item.qty = 1;
+  saveCart();
+}
+
+/* update UI cart */
+function updateCartUI(){
+  const list = document.getElementById('cartList');
+  list.innerHTML = '';
+  if(!CART.length){
+    list.innerHTML = '<div class="smallNote">السلة فارغة</div>';
+    document.getElementById('cartCount').textContent = 0;
+    document.getElementById('subTotalText').textContent = '0 دج';
+    document.getElementById('grandTotalText').textContent = '0 دج';
+    return;
+  }
+  let subtotal = 0;
+  CART.forEach(item=>{
+    subtotal += item.price * item.qty;
+    const el = document.createElement('div'); el.className='cartItem';
+    el.innerHTML = `<img src="${item.image}" onerror="this.src='https://via.placeholder.com/120x80?text=No+Image'"><div style="flex:1">
+      <div style="font-weight:700">${escapeHtml(item.title)}</div>
+      <div class="smallNote">${numberWithCommas(item.price)} دج × ${item.qty}</div>
+      <div style="margin-top:6px;display:flex;gap:6px">
+        <button class="btn btn-ghost" onclick="changeQty('${item.id}', -1)">−</button>
+        <button class="btn btn-ghost" onclick="changeQty('${item.id}', 1)">+</button>
+        <button class="btn btn-ghost" onclick="removeFromCart('${item.id}')">حذف</button>
+      </div>
+    </div>`;
+    list.appendChild(el);
+  });
+
+  const shipping = SHIPPING_COST();
+  const grand = subtotal + shipping;
+  document.getElementById('cartCount').textContent = CART.reduce((s,i)=>s+i.qty,0);
+  document.getElementById('subTotalText').textContent = numberWithCommas(subtotal) + ' دج';
+  document.getElementById('shippingText').textContent = numberWithCommas(shipping) + ' دج';
+  document.getElementById('grandTotalText').textContent = numberWithCommas(grand) + ' دج';
+}
+
+/* تفريغ السلة */
+document.getElementById('clearCartBtn').addEventListener('click', ()=>{
+  if(!CART.length) return;
+  if(!confirm('هل تريد تفريغ السلة؟')) return;
+  CART = []; saveCart(); toast('تم تفريغ السلة');
+});
+
+/* Checkout -> يفتح البريد مع ملخص الطلب */
+document.getElementById('checkoutBtn').addEventListener('click', ()=>{
+  if(!CART.length) return alert('السلة فارغة');
+  const name = prompt('الاسم الكامل:');
+  if(!name) return;
+  const phone = prompt('رقم الهاتف:');
+  if(!phone) return;
+  const address = prompt('عنوان التوصيل (الولاية/المدينة/العنوان):');
+  if(!address) return;
+
+  const shipping = SHIPPING_COST();
+  let subtotal = CART.reduce((s,i)=>s + i.price * i.qty, 0);
+  const grand = subtotal + shipping;
+  // compose body
+  let body = `طلب شراء من ${SHOP_NAME}%0A%0Aاسم العميل: ${name}%0Aالهاتف: ${phone}%0Aالعنوان: ${address}%0A%0Aتفاصيل الطلب:%0A`;
+  CART.forEach(i => {
+    body += `- ${i.title} x${i.qty} = ${i.price * i.qty} دج%0A`;
+  });
+  body += `%0Aالمجموع: ${numberWithCommas(subtotal)} دج%0Aسعر التوصيل: ${numberWithCommas(shipping)} دج%0Aالإجمالي: ${numberWithCommas(grand)} دج%0A`;
+  body += `%0A(تم الإرسال عبر الموقع)`;
+
+  // mailto
+  const mailto = `mailto:${encodeURIComponent(STORE_EMAIL)}?subject=${encodeURIComponent('طلب شراء من الموقع')}&body=${body}`;
+  window.location.href = mailto;
+  // optionally, clear cart after checkout:
+  // CART = []; saveCart();
+});
+
+/* ---------- Upload proposals (client-side) ---------- */
+function openUpload(){ document.getElementById('modalUpload').style.display='flex'; }
+function openAdmin(){ document.getElementById('modalAdmin').style.display='flex'; }
+function closeModal(id){ document.getElementById(id).style.display='none'; }
+
+/* عند إرسال اقتراح - نقوم بقراءة الصورة كـ dataURL ثم تخزين اقتراح محلياً وإرسال إشعار بالبريد (mailto مع تفاصيل) */
+function submitProposal(){
+  const title = document.getElementById('p_title').value.trim();
+  const price = document.getElementById('p_price').value.trim();
+  const desc = document.getElementById('p_desc').value.trim();
+  const file = document.getElementById('p_image').files[0];
+  if(!title || !price || !desc || !file) return alert('املأ كل الحقول واختر صورة');
+  if(!file.type.startsWith('image/')) return alert('اختر ملف صورة');
+
+  const reader = new FileReader();
+  reader.onload = function(e){
+    const dataUrl = e.target.result;
+    // save proposal to localStorage
+    const proposals = JSON.parse(localStorage.getItem('ft_proposals') || '[]');
+    const id = 'prop_' + Date.now();
+    proposals.push({ id, title, price: Number(price), desc, image: dataUrl, date: new Date().toISOString() });
+    localStorage.setItem('ft_proposals', JSON.stringify(proposals));
+    closeModal('modalUpload');
+    toast('تم إرسال الاقتراح، سيتطلب الموافقة لنشره');
+
+    // send mailto notification (ملحوظة: لا يمكن إرفاق الصورة عبر mailto؛ فقط نخبر المالك بوجود اقتراح)
+    const mailBody = encodeURIComponent(`تم تقديم منتج جديد للمراجعة:%0Aعنوان: ${title}%0Aالسعر: ${price} دج%0Aوصف: ${desc}%0Aمعاينة: افتح لوحة المالك في المتصفح لمراجعة الصورة.`);
+    window.location.href = `mailto:${encodeURIComponent(STORE_EMAIL)}?subject=${encodeURIComponent('اقتراح منتج جديد للمراجعة')}&body=${mailBody}`;
+  };
+  reader.readAsDataURL(file);
+}
+
+/* ---------- Admin functions (local) ---------- */
+document.getElementById('openAdminBtn').addEventListener('click', ()=>{
+  const pass = prompt('كلمة مرور المالك (افتراضية: 1234):');
+  if(pass !== '1234') return alert('كلمة مرور خاطئة'); // حماية بسيطة (يمكن تغييرها)
+  openAdmin();
+  renderAdminProducts();
+});
+
+function adminAddProduct(){
+  const title = document.getElementById('admin_title').value.trim();
+  const price = Number(document.getElementById('admin_price').value || 0);
+  const image = document.getElementById('admin_image').value.trim() || 'https://via.placeholder.com/400x300?text=No+Image';
+  const desc = document.getElementById('admin_desc').value.trim();
+  if(!title || !price) return alert('السكوت: املأ العنوان والسعر');
+  const products = loadProducts();
+  products.push({ id: 'p_' + Date.now(), title, price, desc, image });
+  saveProducts(products);
+  renderProducts(); renderAdminProducts();
+  toast('تم إضافة المنتج');
+  // clear fields
+  document.getElementById('admin_title').value=''; document.getElementById('admin_price').value=''; document.getElementById('admin_image').value=''; document.getElementById('admin_desc').value='';
+}
+
+function renderAdminProducts(){
+  const wrap = document.getElementById('adminProducts'); wrap.innerHTML = '';
+  const products = loadProducts();
+  products.slice().reverse().forEach(p=>{
+    const el = document.createElement('div'); el.style.display='flex'; el.style.alignItems='center'; el.style.justifyContent='space-between';
+    el.style.gap='8px'; el.style.padding='8px'; el.style.border='1px solid rgba(0,0,0,0.04)'; el.style.borderRadius='8px';
+    el.innerHTML = `<div style="display:flex;gap:8px;align-items:center"><img src="${p.image}" style="width:56px;height:40px;object-fit:cover;border-radius:6px" onerror="this.src='https://via.placeholder.com/120x80?text=No+Image'"><div><div style="font-weight:700">${escapeHtml(p.title)}</div><div class="smallNote">${numberWithCommas(p.price)} دج</div></div></div>
+    <div style="display:flex;gap:6px">
+      <button class="btn btn-ghost" onclick="editProduct('${p.id}')">تعديل</button>
+      <button class="btn btn-ghost" onclick="deleteProduct('${p.id}')">حذف</button>
+    </div>`;
+    wrap.appendChild(el);
+  });
+}
+
+function editProduct(id){
+  const products = loadProducts();
+  const p = products.find(x=>x.id===id);
+  if(!p) return alert('منتج غير موجود');
+  const title = prompt('العنوان:', p.title); if(!title) return;
+  const price = prompt('السعر:', p.price); if(!price) return;
+  const desc = prompt('الوصف:', p.desc || '');
+  const image = prompt('رابط الصورة:', p.image) || p.image;
+  p.title = title; p.price = Number(price); p.desc = desc; p.image = image;
+  saveProducts(products); renderProducts(); renderAdminProducts();
+  toast('تم تحديث المنتج');
+}
+
+function deleteProduct(id){
+  if(!confirm('هل تريد حذف هذا المنتج؟')) return;
+  let products = loadProducts(); products = products.filter(x=>x.id!==id); saveProducts(products);
+  renderProducts(); renderAdminProducts(); toast('تم حذف المنتج');
+}
+
+/* ---------- proposals management (admin can approve to publish) ---------- */
+function getProposals(){ return JSON.parse(localStorage.getItem('ft_proposals') || '[]'); }
+function renderProposalsAdmin(){
+  const props = getProposals();
+  if(!props.length) return;
+  // simple rendering: alert listing and option to approve via adminProducts view
+  let list = 'المقترحات الموجودة:\\n';
+  props.forEach((p,i)=> list += `${i+1}. ${p.title} — ${p.price} دج\\n`);
+  alert(list + '\\nافتح لوحة المالك لمراجعة الصور والموافقة يدوياً.');
+}
+
+/* approve proposal -> تحويله لمنتج منشور */
+function approveProposal(id){
+  const props = getProposals();
+  const idx = props.findIndex(p=>p.id===id);
+  if(idx === -1) return alert('غير موجود');
+  const p = props.splice(idx,1)[0];
+  localStorage.setItem('ft_proposals', JSON.stringify(props));
+  const prods = loadProducts(); prods.push({ id:'p_' + Date.now(), title:p.title, price:p.price, desc:p.desc, image:p.image });
+  saveProducts(prods);
+  renderProducts(); renderAdminProducts();
+  toast('تم الموافقة ونشر المنتج');
+}
+
+/* ---------- helper utilities ---------- */
+function numberWithCommas(x){ return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","); }
+function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+
+/* small toast */
+function toast(msg){
+  const el = document.createElement('div'); el.textContent = msg;
+  el.style.position='fixed'; el.style.bottom='18px'; el.style.left='50%'; el.style.transform='translateX(-50%)';
+  el.style.background='linear-gradient(90deg,var(--purple-1),var(--purple-2))'; el.style.color='white'; el.style.padding='10px 16px';
+  el.style.borderRadius='999px'; el.style.boxShadow='0 6px 24px rgba(0,0,0,0.2)'; el.style.zIndex=9999;
+  document.body.appendChild(el);
+  setTimeout(()=> el.style.opacity='0.01',2200);
+  setTimeout(()=> el.remove(),2500);
+}
+
+/* shipping cost getter (JS) */
+function SHIPPING_COST(){ return Number(${SHIPPING_COST} || ${SHIPPING_COST}); } // replaced later programmatically
+
+/* quick buy (فتح نافذة بريد مباشرة مع المنتج واحد) */
+function quickBuy(productId){
+  const products = loadProducts(); const p = products.find(x=>x.id===productId); if(!p) return;
+  const name = prompt('الاسم الكامل:'); if(!name) return;
+  const phone = prompt('هاتف:'); if(!phone) return;
+  const addr = prompt('العنوان/الولاية:'); if(!addr) return;
+  const shipping = SHIPPING_COST();
+  const total = (p.price) + shipping;
+  let body = `طلب شراء من ${SHOP_NAME}%0A%0Aاسم: ${name}%0Aالهاتف: ${phone}%0Aالعنوان: ${addr}%0A%0Aالمنتج: ${p.title}%0Aالسعر: ${p.price} دج%0Aسعر التوصيل: ${shipping} دج%0Aالمجموع: ${total} دج`;
+  window.location.href = `mailto:${encodeURIComponent(STORE_EMAIL)}?subject=${encodeURIComponent('طلب شراء - ' + p.title)}&body=${encodeURIComponent(body)}`;
+}
+
+/* whatsapp/contact */
+document.getElementById('whatsappBtn').addEventListener('click', ()=>{
+  if(!WHATSAPP_NUMBER) return alert('رقم الواتساب غير مضاف بعد. يمكنك إضافته في إعدادات الكود.');
+  window.open('https://wa.me/' + WHATSAPP_NUMBER + '?text=' + encodeURIComponent('مرحبًا، لدي استفسار عن منتجاتكم'));
+});
+
+document.getElementById('contactSellerBtn').addEventListener('click', ()=>{
+  window.location.href = `mailto:${encodeURIComponent(STORE_EMAIL)}?subject=${encodeURIComponent('استفسار من الموقع')}`;
+});
+
+/* utils: init */
+function init(){
+  // replace placeholder SHIPPING_COST function with actual value injected
+  window.SHIPPING_COST = function(){ return Number(${SHIPPING_COST}); };
+  // if user didn't replace email, warn once
+  if(STORE_EMAIL === 'YOUR_STORE_EMAIL@example.com') console.warn('Please set STORE_EMAIL variable in the script to receive orders.');
+  renderProducts(); updateCartUI();
+}
+init();
+
+/* helper: open modals for upload/admin */
+document.getElementById('openUploadBtn').addEventListener('click', openUpload);
+
+function scrollToStore(){ window.scrollTo({ top: document.querySelector('.storePanel').offsetTop - 20, behavior:'smooth' }); }
+
+/* ensure saveCart at start */
+saveCart();
+
+/* close modals on backdrop click */
+document.querySelectorAll('.modal-back').forEach(b=>{
+  b.addEventListener('click', (ev)=>{ if(ev.target === b) b.style.display='none'; });
+});
+</script>
+
+</body>
+</html>
